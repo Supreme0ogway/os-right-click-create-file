@@ -91,8 +91,8 @@ custom_rules:
     message: "No else. guard to leave, switch to choose."
     severity: error
 
-  literature_reference:
+  document_reference:
     name: "Reference to the documents"
-    regex: "(CODE-RULES|literature/|§[0-9])"
+    regex: "(CODE-RULES|USAGE-LAWS|§[0-9])"
     message: "No reference to the documents from code. Write the reason instead."
     severity: error

@@ -118,13 +118,13 @@ cannot disagree with the copy another thread is holding.
 
 # 2b. Interface controls are a library
 
-Every button, switch, slider and labelled row comes from `shared/ui/`
-(`@Right-Click-Menu/ui`). No panel builds its own. It depends on nothing in the
-app, so anything can reuse it. Lint allows it in `app/` and `ui/` only.
+Every button, switch, slider and labelled row comes from
+`RightClickMenuUI/controls/`. No panel builds its own. The folder depends on
+nothing else in the module, so anything can reuse it.
 
 * **A native control, always** — a button is a button, a slider a slider.
   Keyboard, focus and screen readers come free.
-* **It carries its own look**, from the ui module's tokens.
+* **It carries its own look**, from the module's brand tokens.
 * **It holds no words.** Labels are passed in, already looked up.
 
 ---
@@ -141,8 +141,7 @@ view         layout. controls from ui/ (§2b). no formatting, no file work
 ```
 
 1. **A view-model imports no interface framework.** That is what makes every rule in it
-   testable by the ordinary test run — the same argument §4b makes for keeping decisions
-   out of a handler.
+   testable by the ordinary test run, with no window on screen and no Xcode.
 2. **A view-model owns no truth.** It subscribes to the store (§5b) and hands on what it
    is given. Two screens reading one legend cannot disagree, because neither holds it.
 3. **A view decides nothing.** No formatting, no branching on a state it could have been
@@ -151,8 +150,8 @@ view         layout. controls from ui/ (§2b). no formatting, no file work
 4. **Sorted one folder per screen**, the two files side by side:
 
 ```text
-ui/legend-editor/legend-editor-view.swift
-ui/legend-editor/legend-editor-view-model.swift
+Sources/RightClickMenuUI/legend-editor/legend-editor-view.swift
+Sources/RightClickMenuUI/legend-editor/legend-editor-view-model.swift
 ```
 
 5. A view-model is a logic file and takes its sibling test (§7b). A view is exempt and is
@@ -165,7 +164,8 @@ ui/legend-editor/legend-editor-view-model.swift
 # 3. One way in: the module's public interface
 
 1. Import the module, never a file inside it.
-2. The umbrella header or public interface re-exports and routes. No logic.
+2. The module's public interface file re-exports and routes. No logic. It is the
+   one named after the module — `right-click-menu-core.swift` and its siblings.
 3. A module's own files use each other freely.
 4. A deep import is a lint error.
 
@@ -180,7 +180,7 @@ a line outside it.
    or grouped under `// MARK:` comments.
 2. **Declarations are internal by default.** What a thing is and who may have it
    are separate decisions.
-3. An umbrella header is exempt — a funnel is already nothing but re-exports.
+3. A public interface file is exempt — a funnel is already nothing but re-exports.
 4. Types are named in the block like anything else.
 
 One place answers "what does this file give the world?" Otherwise a private
@@ -195,7 +195,6 @@ you touch, not the whole repo at once.
 app          bootstrap, launch at login, the menu bar item
 ui           panels, screens, the legend editor
 core         the app's decisions: templates, naming, writing a file
-net          the only layer that fetches
 shared       formats, schemas, invariants. Imports nothing.
 ```
 
@@ -203,42 +202,27 @@ Import your own layer and below, never above. **No cycles** — lint, not
 discipline.
 
 * **`shared/` is the floor.** Everything imports it and it must behave
-  identically everywhere: no imports, no side effects, no SDK.
-* **Only `net/` fetches.**
+  identically on both sides of the sandbox: no imports, no side effects, no SDK.
+* **The bundles hold no decisions.** They are the two things that cannot be a
+  package, and nothing else.
+* **Nothing fetches.** This app is offline. It reads the machine it is on and the
+  shared app group folder, and nothing else. A network call is a new layer and a
+  new argument, not a line added somewhere.
 
 ---
 
-# 4b. Handler, usecase, repository
+# 5. Nothing blocks the menu
 
-Server code is sorted by how far a request has got. One file per stop.
+Finder waits while the extension builds the right click menu. Everything slow is
+therefore somebody's frozen right-click.
 
-```text
-handler       one per callable. Thin: read the request, check who is asking,
-              call one usecase, turn a throw into a reply. Holds no rules.
-usecase       the decision. Takes its repositories as arguments.
-repository    the only files importing the backend SDK. One per collection.
-              Reads and writes records. Decides nothing.
-shared        the shapes every side agrees on.
-```
-
-* **A usecase never imports an SDK** — that is what makes the half of the
-  backend with the decisions in it testable by the ordinary test run.
-* **A handler holds no rules.** A rule decided there cannot be tested without a
-  request.
-* **Models live in `shared/`.** Two answers to "what is a template" is how
-  records go missing.
-* One file per thing. The funnel applies unchanged (§3).
-
----
-
-# 5. Nothing blocks the frame
-
-* No `await` in the frame path. Ever.
-* No parsing or file work on the main thread.
-* No allocation in steady state: reuse scratch buffers, hold typed arrays.
-* No bulk disposal in a visibility or update pass; disposal is its own phase.
-* Anything over a millisecond is a **job**: prioritised, cancellable, sliced.
-* Every system declares a budget and the profiler shows it.
+* **No `await` while building the menu.** Ever. It reads what is already there.
+* **No parsing or file work on the main thread**, in either bundle.
+* **The extension does the least.** It reads the legend, builds the entries and
+  forwards a click as an address. It writes nothing and decides nothing (§4).
+* Anything over a millisecond belongs in the app, off the menu path, and is
+  cancellable.
+* **A speed claim comes with a number.** Menu build time is measured, not assumed.
 
 ---
 
@@ -255,7 +239,7 @@ to reach for first.
 3. **Installed once, at boot, under one seam.** Everything below gets it as an
    argument or through that seam, so a test hands in a fake.
 4. **Absent is normal.** A store nobody installed answers like an empty one and
-   the app runs on. No store is ever load-bearing for the frame.
+   the app runs on. No store is ever load-bearing for the menu.
 5. **A new thing plugs in by subscribing**, not by the store learning its name.
    The store never imports a subscriber.
 
@@ -277,13 +261,12 @@ If someone cannot add a file type without a rebuild, it is in the wrong place.
 
 ---
 
-# 6b. Constants live in three folders and nowhere else
+# 6b. Constants live in two folders and nowhere else
 
 | folder | holds | read by |
 | --- | --- | --- |
-| `src/constants/` | interface, input, profiler | the app |
-| `shared/constants/app/` | limits, defaults, schema version | app **and** server |
-| `shared/constants/backend/` | paths, regions, timeouts, batch sizes | everything |
+| `shared/constants/app/` | limits, defaults, schema version, ids, messages | app **and** extension |
+| `shared/constants/bridge/` | bundle ids, container paths, request keys, timeouts | everything |
 
 1. **Constants only.** No functions, no logic, no imports.
 2. **Every string is a constant, including one used once** — that is the one
@@ -298,24 +281,6 @@ If someone cannot add a file type without a rebuild, it is in the wrong place.
 
 The expensive thing is never writing a value, it is finding every place one was
 written.
-
----
-
-# 6d. Keybinds are sorted by who they are for
-
-`keybinds/user` — everyone, rebindable, listed in the menu.
-`keybinds/developer` — only with the instrumentation flag.
-
-* **A user is never one keystroke from a diagnostic.**
-* **Developer actions never appear in the rebinding list** — offering them
-  advertises them.
-* **A developer binding is never worth anything.** It changes what the app shows
-  or how cheaply it draws, never what gets written to disk.
-* **Bind by physical key code, never by letter.** `KeyW` is the same physical
-  key on a French keyboard; `W` is not.
-* **Sort by what a hand does**, not alphabetically.
-
-The flag decides what is offered, never what anything is worth.
 
 ---
 
@@ -355,7 +320,7 @@ Tests/RightClickMenuCoreTests/legend/legend-store-tests.swift
    target share a directory, and the test run is `swift test` (§0). Never a `__tests__`
    tree, never one bag of tests per module, never a name that does not match its source.
 2. **A logic file without a sibling test fails the build.**
-3. Exempt, and the list is closed: umbrella headers, data tables, constants
+3. Exempt, and the list is closed: public interface files, data tables, constants
    folders (§6b), and entry points, whose decisions live in a module that is not
    exempt.
 4. Write the test, watch it fail for the right reason, write the smallest thing
@@ -445,7 +410,7 @@ if canCreate(type: type, in: folder, named: name) {
 **Write it for a ten-year-old.** Plain words, short sentences, as few as
 possible. No corporate phrasing, no wind-up, no restating the code. Explain a
 hard idea in one plain sentence and define the term in brackets the first time
-it appears in a file. Same for documents in `literature/`: short, plain, around
+it appears in a file. Same for documents in `docs/`: short, plain, around
 100 lines unless the content truly needs more. The *why* stays; it gets fewer
 words.
 
@@ -468,7 +433,7 @@ words.
 
 **Budgets**: file header **10 lines**, a declaration's prose **3 sentences**, a
 note **5 lines**. Going over means the file does too much (§1) or the reason
-belongs in `literature/`. Cut the war story (`git log` has it), the
+belongs in `docs/`. Cut the war story (`git log` has it), the
 re-argument, the restatement, the wind-up. Never cut the non-obvious reason a
 line exists, the units, the ranges, or the one trap.
 
@@ -493,13 +458,16 @@ substitutes for the other.
 * **Run it. Screenshot it. Look at it.** The worst bugs here threw nothing and
   failed no test: a menu entry that never appeared, a file written to the wrong
   folder, an icon that rendered blank.
-* **Interface is looked at in `tools/inspect/`**, one panel with nothing else
-  running. Judging a menu inside the whole app means judging it against whatever
-  else is on screen. Subject and state come from the address, so a screenshot is
-  a URL. A panel marked hidden that was still on screen shipped here, because an
-  inline style beat the framework's own rule.
-* Frame graph before and after on anything in the frame path. A performance
-  claim without a number is decoration.
+* **`make run` is the only honest test of the menu.** It installs to
+  `/Applications`, stops the copy already running and restarts Finder. A copy run
+  from anywhere else, or an old one left running, is the usual reason a change
+  appears to do nothing. Then right click — on the Desktop **and** in a Finder
+  window, because they are not the same menu.
+* **Interface is looked at in the app's own window**, one panel at a time with
+  nothing else in front of it. Judging a panel against a busy screen is judging
+  the screen.
+* A speed claim comes with a number (§5). Time the menu build before and after
+  anything on that path.
 
 ---
 
@@ -518,18 +486,15 @@ substitutes for the other.
 - [ ] No inline comments; every export has DocC with types, inside budget (§10).
 - [ ] Nothing nested past two; no loop in a loop; no nested ternaries.
 - [ ] No `else`; `guard` to leave, `switch` to choose, no needless `default` (§7c).
-- [ ] No `literature/` reference in code. Spelled `color` never `colour`.
-- [ ] Every constant, **including every string**, in one of the properly separated constant folders
+- [ ] No reference to these documents from code. Spelled `color` never `colour`.
+- [ ] Every constant, **including every string**, in one of the two constant folders (§6b).
 - [ ] Arithmetic in named steps; no bare numbers mid-expression, tests aside (§6e).
 - [ ] Controls came from `@Right-Click-Menu/ui`.
-- [ ] New bindings went in the file for their audience (§6d).
-- [ ] Interface changes looked at in `tools/inspect/`.
-- [ ] Imports go through the module's umbrella header or public interface; dependencies flow down; no new cycles.
+- [ ] Imports go through the module's public interface; dependencies flow down; no new cycles.
 - [ ] One sorted list of public / open extensions at the bottom of the file, or grouped using // MARK: comments.
-- [ ] No `fetch` outside `net/`. Backend in its layer; no SDK in a usecase.
-- [ ] Nothing new blocks the frame; new work is a job with a budget.
+- [ ] Nothing fetches. The bundles hold no decisions; `shared/` still imports nothing.
+- [ ] Nothing new runs while the menu is being built; slow work moved to the app (§5).
 - [ ] Shared state is one store that others subscribe to; no polling, no store that names a subscriber (§5b).
-- [ ] Nothing allocates per frame; any new cache has a budget and eviction rule.
 - [ ] New content is data, with namespaced ids and a version.
 - [ ] Any new failure path degrades rather than stopping.
-- [ ] It was run, and the picture was looked at.
+- [ ] `make run`, then right clicked on the Desktop and in a Finder window, and the picture looked at.
