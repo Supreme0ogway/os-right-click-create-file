@@ -28,8 +28,8 @@
 /* Label for the text every new file of this type starts with. */
 "editor.template" = "Starts with";
 
-/* Title of the editor window. */
-"editor.title" = "File Types";
+/* The app's name, shown at the top of its window. */
+"app.name" = "Right Click Menu";
 
 /* Tab holding the list of file types. */
 "scope.tab-types" = "File Types";
@@ -44,7 +44,7 @@
 "scope.picked-folders" = "Only these folders";
 
 /* Explains that a picked folder also covers what is inside it. */
-"scope.picked-note" = "Each folder also covers everything inside it.";
+"scope.picked-note" = "A folder you choose includes every folder inside it.";
 
 /* Button that opens the panel for picking a folder. */
 "scope.add-folder" = "Add Folder…";
@@ -83,7 +83,7 @@
 "transfer.file-is-damaged" = "That file is corrupted and cannot be read.";
 
 /* Heading of the part of settings that writes file types out and reads them back. */
-"transfer.title" = "File Types";
+"transfer.title" = "Import/Export List";
 
 /* Button that writes every file type out to a file. */
 "transfer.export" = "Export…";
@@ -92,7 +92,7 @@
 "transfer.import" = "Import…";
 
 /* Explains what exporting and importing do. */
-"transfer.note" = "Importing adds to your list. A type with the same id is replaced.";
+"transfer.note" = "Importing adds to your list.";
 
 /* Title of the panel for choosing where to write the file types. */
 "transfer.choose-destination" = "Where should your file types go?";
@@ -110,10 +110,7 @@
 "about.whats-new" = "What's new";
 
 /* Heading of the part of settings choosing where the menu appears. */
-"scope.title" = "Where the menu appears";
-
-/* Title of the screen for adding a file type. */
-"add.title" = "Add a File Type";
+"scope.title" = "Where It Appears";
 
 /* Label for the dropdown of file kinds the app already knows. */
 "add.kind" = "Kind";
@@ -152,7 +149,7 @@
 "editor.contents" = "File default contents";
 
 /* A few words under the contents editor. */
-"editor.contents-hint" = "Coloured to match the extension";
+"editor.contents-hint" = "Colored to match the extension";
 
 /* Shown when a box has been left empty. */
 "problem.missing" = "This cannot be empty.";
@@ -165,3 +162,30 @@
 
 /* Shown when a character was typed that would move the file elsewhere. */
 "problem.holds-path-character" = "This cannot hold a slash or a colon.";
+
+/* Heading of the part of settings choosing what the add screen starts on. */
+"default-kind.title" = "New File Type";
+
+/* Label for the choice of what the add screen starts on. */
+"default-kind.label" = "Start on";
+
+/* Explains what choosing a starting kind does. */
+"default-kind.note" = "Every time you add a file type it opens on this.";
+
+/* Label for the extension a custom default starts from. */
+"default-kind.custom-extension" = "Default extension";
+
+/* Explains that a blank default extension means typing one every time. */
+"default-kind.custom-hint" = "Leave blank to type it each time";
+
+/* Title of the question asked before a file type is removed. %@ is its name. */
+"remove.question" = "Delete “%@”?";
+
+/* Explains that removing a file type cannot be undone. */
+"remove.warning" = "It will be taken out of your right click menu. This cannot be undone.";
+
+/* Button that goes ahead with removing a file type. */
+"remove.confirm" = "Delete";
+
+/* Button that leaves the file type alone. */
+"remove.cancel" = "Cancel";

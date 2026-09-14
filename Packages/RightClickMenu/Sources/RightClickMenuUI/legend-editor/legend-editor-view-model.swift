@@ -1,3 +1,4 @@
+import Foundation
 import Observation
 
 /// What the legend editor screen knows and can do.
@@ -23,6 +24,12 @@ public final class LegendEditorViewModel {
 
     /// The last thing that went wrong, if anything did.
     public private(set) var problem: String?
+
+    /// The type somebody has asked to remove, waiting to be told to go ahead.
+    ///
+    /// Removing a type cannot be undone, so it is asked about first. Both the list and
+    /// the form ask through here, so the question is worded and answered in one place.
+    public private(set) var pendingRemoval: FileTypeIdentifier?
 
     @ObservationIgnored private var subscription: StoreSubscription?
     @ObservationIgnored private var nextNewNumber = 1
@@ -55,6 +62,23 @@ public final class LegendEditorViewModel {
 
     /// Whether the search found nothing, as opposed to there being nothing at all.
     public var showsNoMatchesMessage: Bool { !types.isEmpty && shownTypes.isEmpty }
+
+    /// Whether the list can be dragged into a new order.
+    ///
+    /// Only while nothing is being searched for. A search shows part of the list, and
+    /// dropping a row inside part of a list says nothing about where it belongs in
+    /// the whole of it.
+    public var canReorder: Bool { search.trimmed.isEmpty }
+
+    /// Moves types to a new place in the order, which is the order of the menu.
+    ///
+    /// - Parameters:
+    ///   - offsets: Where the types being moved are now.
+    ///   - destination: Where they should land.
+    public func move(from offsets: IndexSet, to destination: Int) {
+        guard canReorder else { return }
+        write(store.value.moving(from: Array(offsets), to: destination))
+    }
 
     /// Adds a new file type to the end of the list.
     ///
@@ -99,6 +123,35 @@ public final class LegendEditorViewModel {
     /// - Parameter legend: The list as it should now stand.
     public func replaceAll(with legend: Legend) {
         write(legend)
+    }
+
+    /// Whether the question about removing a type is being asked.
+    public var isAskingToRemove: Bool { pendingRemoval != nil }
+
+    /// What the type waiting to be removed is called, for the question to name it.
+    public var pendingRemovalName: String {
+        guard let pendingRemoval else { return "" }
+        return types.first { $0.id == pendingRemoval }?.displayName ?? ""
+    }
+
+    /// Asks whether a type should be removed, rather than removing it.
+    ///
+    /// - Parameter id: The type somebody wants to take out.
+    public func askToRemove(_ id: FileTypeIdentifier) {
+        guard types.contains(where: { $0.id == id }) else { return }
+        pendingRemoval = id
+    }
+
+    /// Removes the type that was asked about.
+    public func confirmRemoval() {
+        guard let pendingRemoval else { return }
+        removeType(pendingRemoval)
+        self.pendingRemoval = nil
+    }
+
+    /// Leaves the type alone and stops asking.
+    public func cancelRemoval() {
+        pendingRemoval = nil
     }
 
     /// Whether a type is filled in enough to appear in the menu.

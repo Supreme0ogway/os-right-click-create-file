@@ -3,12 +3,12 @@ import SwiftUI
 /// The part of settings that writes file types out and reads them back.
 ///
 /// Layout only. Reading a file and saying when one cannot be read are the model's job.
-struct TransferSection: View {
+struct TransferPanel: View {
 
     let model: TransferViewModel
 
     var body: some View {
-        Section {
+        VStack(alignment: .leading, spacing: FieldLayout.rowGap) {
             HStack {
                 Button(UIText.export, systemImage: TransferLayout.exportIconName, action: export)
                 Button(
@@ -16,15 +16,16 @@ struct TransferSection: View {
                     systemImage: TransferLayout.importIconName,
                     action: bringIn
                 )
-                Spacer()
             }
-        } header: {
-            Text(UIText.transferTitle)
-        } footer: {
+
             Text(UIText.transferNote)
                 .font(.caption)
                 .foregroundStyle(.secondary)
+
+            Spacer(minLength: 0)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(FieldLayout.formPadding)
     }
 
     private func export() {

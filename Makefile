@@ -13,7 +13,7 @@ BUILT      := .dist/Build/Products/Debug/$(APP_NAME).app
 PACKAGE    := Packages/RightClickMenu
 
 .DEFAULT_GOAL := help
-.PHONY: help bootstrap gen build test lint run install register enable diagnose clean
+.PHONY: help bootstrap gen build test lint spelling run stop install register diagnose clean
 
 help:
 	@echo "make bootstrap   install xcodegen + swiftlint, check signing identity"
@@ -37,14 +37,24 @@ gen:
 test:
 	@swift test --package-path $(PACKAGE)
 
-lint:
+lint: spelling
 	@swiftlint lint --quiet --strict
 
+# SwiftLint only reads Swift, so the wrong spelling can hide in a strings file,
+# a plist or a data file. This reads everything that is tracked.
+spelling:
+	@! git grep -niE "colo[u]r" -- . ':!LICENSE' ':!.swiftlint.yml' ':!docs/CODE-RULES.md' \
+		|| { echo "Spell it color. The rule is in docs/CODE-RULES.md."; exit 1; }
+
+# Piping xcodebuild through grep would hand back grep's result, so a failed build
+# looked like a good one and the last working app got installed over and over.
 build: gen
+	@mkdir -p .dist
 	@xcodebuild -project $(SCHEME).xcodeproj -scheme $(SCHEME) \
 		-configuration Debug -derivedDataPath .dist \
-		-destination 'platform=macOS' build | \
-		grep -E "error:|warning:|BUILD" || true
+		-destination 'platform=macOS' build > .dist/build.log 2>&1 \
+		|| { grep -E "error:" .dist/build.log | head -20; echo "BUILD FAILED"; exit 1; }
+	@echo "** BUILD SUCCEEDED **"
 
 run: build install register
 	@killall Finder 2>/dev/null || true
@@ -53,11 +63,17 @@ run: build install register
 	@echo "Running. Right-click the Desktop."
 	@echo "If the entry is missing, run: make diagnose"
 
-install:
+install: stop
 	@mkdir -p "$(INSTALL_DIR)"
 	@rm -rf "$(APP)"
 	@ditto "$(BUILT)" "$(APP)"
 	@echo "installed $(APP)"
+
+# Installing over a running app leaves the old one running, and then `open` does
+# nothing because it is already open, so every test runs against the previous build.
+stop:
+	@pkill -f "$(APP_NAME).app/Contents/MacOS" 2>/dev/null || true
+	@sleep 1
 
 register:
 	@pluginkit -r "$(BUILT)/Contents/PlugIns/finder-extension.appex" 2>/dev/null || true

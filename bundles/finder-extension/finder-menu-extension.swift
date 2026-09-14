@@ -1,6 +1,7 @@
 import AppKit
 import FinderSync
 import RightClickMenuCore
+import UniformTypeIdentifiers
 import os
 
 /// The part of the app that lives inside the Finder.
@@ -9,6 +10,10 @@ import os
 /// it is told to show, and pass a click on to the app. Every decision behind those
 /// answers is worked out in the module it imports, where it can be tested without a
 /// Finder to click in.
+///
+/// The menu is one entry with the file types hanging off it, so the Finder's own menu
+/// gains a single line however many types somebody has. Each type carries the icon the
+/// mac already uses for that extension.
 ///
 /// It runs in a sandbox and is not allowed to write files, which is why a click is
 /// forwarded to the app rather than acted on here.
@@ -46,19 +51,37 @@ final class FinderMenuExtension: FIFinderSync {
             return nil
         }
 
-        let menu = NSMenu(title: "")
+        let flyout = NSMenu(title: MenuPlan.parentTitle)
         for entry in MenuPlan.entries(for: legend) {
-            let item = NSMenuItem(
-                title: entry.title,
-                action: #selector(createFile(_:)),
-                keyEquivalent: ""
-            )
-            item.target = self
-            item.tag = entry.place
-            menu.addItem(item)
+            flyout.addItem(item(for: entry, in: legend))
         }
-        log.info("built \(menu.numberOfItems) entries for kind \(menuKind.rawValue)")
+
+        let parent = NSMenuItem(title: MenuPlan.parentTitle, action: nil, keyEquivalent: "")
+        parent.submenu = flyout
+
+        let menu = NSMenu(title: "")
+        menu.addItem(parent)
+        log.info("built \(flyout.numberOfItems) entries for kind \(menuKind.rawValue)")
         return menu
+    }
+
+    private func item(for entry: MenuEntry, in legend: Legend) -> NSMenuItem {
+        let item = NSMenuItem(
+            title: entry.title,
+            action: #selector(createFile(_:)),
+            keyEquivalent: ""
+        )
+        item.target = self
+        item.tag = entry.place
+        item.image = icon(for: legend.type(withId: entry.typeId)?.fileExtension)
+        return item
+    }
+
+    private func icon(for fileExtension: String?) -> NSImage {
+        let type = fileExtension.flatMap { UTType(filenameExtension: $0) } ?? .data
+        let image = NSWorkspace.shared.icon(for: type)
+        image.size = NSSize(width: MenuIconSize.side, height: MenuIconSize.side)
+        return image
     }
 
     override func beginObservingDirectory(at url: URL) {
@@ -135,6 +158,13 @@ final class FinderMenuExtension: FIFinderSync {
         FIFinderSyncController.default().directoryURLs = folders
         log.info("watching \(folders.count) folders")
     }
+}
+
+/// How big the icon beside each entry is drawn.
+enum MenuIconSize {
+
+    /// The side of the square an icon is drawn in, in points.
+    static let side: CGFloat = 16
 }
 
 /// Where this extension's messages are filed.

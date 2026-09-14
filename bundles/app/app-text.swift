@@ -30,6 +30,12 @@ enum AppText {
     /// Shown when the app and the extension cannot share files.
     static let notSharing = String(localized: "app.not-sharing")
 
+    /// Shown when the scope was narrowed to no folders at all.
+    static let appearsNowhere = String(localized: "app.appears-nowhere")
+
+    /// Shown when every file type has been removed.
+    static let noTypes = String(localized: "app.no-types")
+
     /// Makes the app start when the mac starts.
     static let openAtLogin = String(localized: "app.open-at-login")
 

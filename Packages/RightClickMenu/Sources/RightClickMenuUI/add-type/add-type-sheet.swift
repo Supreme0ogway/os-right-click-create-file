@@ -2,8 +2,11 @@ import SwiftUI
 
 /// The screen for adding a file type.
 ///
-/// Layout only. Which kinds are offered, what counts as filled in, and what the new
-/// type ends up being are all decided in the model.
+/// Deliberately short: a kind, a name, and the extension only when the kind is one the
+/// app does not already know. Everything else about a type is changed afterwards on
+/// the screen made for it, so nothing here has to be decided twice.
+///
+/// Layout only. What is offered and what counts as filled in are the model's job.
 struct AddTypeSheet: View {
 
     @State private var model: AddTypeViewModel
@@ -22,35 +25,36 @@ struct AddTypeSheet: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: FieldLayout.rowGap) {
-                    icon
-                    kindPicker
-                    customExtensionField
-                    nameField
-                    baseNameField
-                }
-                .padding(FieldLayout.formPadding)
+        VStack(alignment: .leading, spacing: AddTypeLayout.rowGap) {
+            kindRow
+
+            if model.isCustom {
+                LabelledField(
+                    label: UIText.fileExtension,
+                    placeholder: AddTypeLayout.extensionHint,
+                    hint: UIText.extensionHint,
+                    problem: UIText.saying(model.extensionProblem),
+                    text: $model.customExtension
+                )
             }
+
+            LabelledField(
+                label: UIText.name,
+                problem: UIText.saying(model.nameProblem),
+                text: $model.name
+            )
 
             buttons
         }
-        .frame(width: AddTypeLayout.width, height: AddTypeLayout.height)
+        .padding(AddTypeLayout.padding)
+        .frame(width: AddTypeLayout.width)
     }
 
-    private var icon: some View {
-        VStack(alignment: .leading, spacing: IconLayout.gap) {
+    private var kindRow: some View {
+        HStack(spacing: AddTypeLayout.iconGap) {
             FileTypeIcon(fileExtension: model.chosenExtension)
-            Text(UIText.iconNote)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-    }
+                .frame(width: AddTypeLayout.iconSize, height: AddTypeLayout.iconSize)
 
-    private var kindPicker: some View {
-        VStack(alignment: .leading, spacing: FieldLayout.lineGap) {
-            FieldLabel(UIText.addKind)
             Picker(UIText.addKind, selection: kindBinding) {
                 ForEach(model.choices) { choice in
                     Text(choice.displayName).tag(choice.fileExtension)
@@ -61,48 +65,16 @@ struct AddTypeSheet: View {
         }
     }
 
-    @ViewBuilder
-    private var customExtensionField: some View {
-        if model.isCustom {
-            LabelledField(
-                label: UIText.fileExtension,
-                placeholder: AddTypeLayout.extensionHint,
-                hint: UIText.extensionHint,
-                problem: UIText.saying(model.extensionProblem),
-                text: $model.customExtension
-            )
-        }
-    }
-
-    private var nameField: some View {
-        LabelledField(
-            label: UIText.name,
-            hint: UIText.nameHint,
-            problem: UIText.saying(model.nameProblem),
-            text: $model.name
-        )
-    }
-
-    private var baseNameField: some View {
-        LabelledField(
-            label: UIText.baseName,
-            hint: UIText.baseNameHint,
-            problem: UIText.saying(model.baseNameProblem),
-            text: $model.baseName
-        )
-    }
-
     private var buttons: some View {
         HStack {
-            Spacer()
             Button(UIText.addCancel, action: onCancel)
                 .keyboardShortcut(.cancelAction)
+            Spacer()
             Button(UIText.addConfirm, action: add)
                 .keyboardShortcut(.defaultAction)
                 .disabled(!model.isReady)
         }
-        .padding(AddTypeLayout.buttonPadding)
-        .background(.bar)
+        .padding(.top, AddTypeLayout.buttonsTopPadding)
     }
 
     private var kindBinding: Binding<String> {
@@ -134,11 +106,20 @@ enum AddTypeLayout {
     static let extensionHint = "conf"
 
     /// How wide the screen is.
-    static let width: CGFloat = 460
+    static let width: CGFloat = 360
 
-    /// How tall the screen is.
-    static let height: CGFloat = 520
+    /// The space around everything on the screen.
+    static let padding: CGFloat = 24
 
-    /// The space around the buttons at the bottom.
-    static let buttonPadding: CGFloat = 14
+    /// The space between one row and the next.
+    static let rowGap: CGFloat = 18
+
+    /// The space between the icon and the dropdown beside it.
+    static let iconGap: CGFloat = 12
+
+    /// The extra space above the buttons at the bottom.
+    static let buttonsTopPadding: CGFloat = 6
+
+    /// How big the icon beside the dropdown is.
+    static let iconSize: CGFloat = 34
 }

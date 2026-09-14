@@ -34,6 +34,11 @@ public enum SharedContainer {
         folderURL?.appending(path: ScopeConstants.fileName)
     }
 
+    /// Where the choices the app remembers are kept.
+    public static var preferencesFileURL: URL? {
+        folderURL?.appending(path: PreferencesConstants.fileName)
+    }
+
     /// Where the extension writes what it last did.
     public static var trailFileURL: URL? {
         folderURL?.appending(path: TrailConstants.fileName)

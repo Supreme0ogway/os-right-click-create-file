@@ -259,3 +259,199 @@ struct LegendEditorSearchTests {
         #expect(shown == ["Markdown File", "Python File", "JSON File"])
     }
 }
+
+@MainActor
+@Suite("Legend editor removing")
+struct LegendEditorRemovingTests {
+
+    private func makeModel() throws -> LegendEditorViewModel {
+        let folder = URL.temporaryDirectory
+            .appending(path: "right-click-menu-tests/\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let types = try ["markdown", "python"].map { name in
+            FileType(
+                id: try FileTypeIdentifier("core:\(name)"),
+                displayName: name,
+                fileExtension: name,
+                defaultBaseName: "Untitled",
+                template: ""
+            )
+        }
+        let store = RecordStore(
+            fileURL: folder.appending(path: LegendConstants.fileName),
+            fallback: Legend(types: types)
+        )
+        return LegendEditorViewModel(store: store)
+    }
+
+    @Test("Nothing is being asked about to begin with")
+    func nothingAskedAtFirst() throws {
+        let model = try makeModel()
+
+        #expect(!model.isAskingToRemove)
+        #expect(model.pendingRemoval == nil)
+    }
+
+    @Test("Asking does not remove anything yet")
+    func askingRemovesNothing() throws {
+        let model = try makeModel()
+
+        model.askToRemove(try FileTypeIdentifier("core:markdown"))
+
+        #expect(model.isAskingToRemove)
+        #expect(model.types.count == 2)
+    }
+
+    @Test("The question names the type it is about")
+    func questionNamesTheType() throws {
+        let model = try makeModel()
+
+        model.askToRemove(try FileTypeIdentifier("core:markdown"))
+
+        #expect(model.pendingRemovalName == "markdown")
+    }
+
+    @Test("Saying yes removes it and stops asking")
+    func yesRemovesIt() throws {
+        let model = try makeModel()
+        model.askToRemove(try FileTypeIdentifier("core:markdown"))
+
+        model.confirmRemoval()
+
+        #expect(model.types.map(\.displayName) == ["python"])
+        #expect(!model.isAskingToRemove)
+    }
+
+    @Test("Saying no leaves it alone and stops asking")
+    func noLeavesItAlone() throws {
+        let model = try makeModel()
+        model.askToRemove(try FileTypeIdentifier("core:markdown"))
+
+        model.cancelRemoval()
+
+        #expect(model.types.count == 2)
+        #expect(!model.isAskingToRemove)
+    }
+
+    @Test("Saying yes when nothing was asked about removes nothing")
+    func yesWithoutAskingDoesNothing() throws {
+        let model = try makeModel()
+
+        model.confirmRemoval()
+
+        #expect(model.types.count == 2)
+    }
+
+    @Test("Asking about a type that is not there asks nothing")
+    func askingAboutUnknownAsksNothing() throws {
+        let model = try makeModel()
+
+        model.askToRemove(try FileTypeIdentifier("core:nowhere"))
+
+        #expect(!model.isAskingToRemove)
+    }
+
+    @Test("The last type can be removed, with the question asked as usual")
+    func lastTypeCanBeRemoved() throws {
+        let model = try makeModel()
+        model.askToRemove(try FileTypeIdentifier("core:markdown"))
+        model.confirmRemoval()
+        model.askToRemove(try FileTypeIdentifier("core:python"))
+
+        model.confirmRemoval()
+
+        #expect(model.types.isEmpty)
+        #expect(model.showsEmptyMessage)
+    }
+}
+
+@MainActor
+@Suite("Legend editor reordering")
+struct LegendEditorReorderingTests {
+
+    private func makeModel() throws -> LegendEditorViewModel {
+        let folder = URL.temporaryDirectory
+            .appending(path: "right-click-menu-tests/\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let types = try ["markdown", "python", "json"].map { name in
+            FileType(
+                id: try FileTypeIdentifier("core:\(name)"),
+                displayName: name,
+                fileExtension: name,
+                defaultBaseName: "Untitled",
+                template: ""
+            )
+        }
+        let store = RecordStore(
+            fileURL: folder.appending(path: LegendConstants.fileName),
+            fallback: Legend(types: types)
+        )
+        return LegendEditorViewModel(store: store)
+    }
+
+    @Test("Dragging a type down puts it in its new place")
+    func draggingDown() throws {
+        let model = try makeModel()
+
+        model.move(from: IndexSet(integer: 0), to: 2)
+
+        #expect(model.types.map(\.displayName) == ["python", "markdown", "json"])
+    }
+
+    @Test("Dragging a type up puts it in its new place")
+    func draggingUp() throws {
+        let model = try makeModel()
+
+        model.move(from: IndexSet(integer: 2), to: 0)
+
+        #expect(model.types.map(\.displayName) == ["json", "markdown", "python"])
+    }
+
+    @Test("A new order is kept, so the right click menu follows it")
+    func newOrderIsKept() throws {
+        let model = try makeModel()
+
+        model.move(from: IndexSet(integer: 0), to: 3)
+
+        #expect(model.store.value.types.map(\.displayName) == ["python", "json", "markdown"])
+    }
+
+    @Test("The menu is built in the order the list was dragged into")
+    func menuFollowsTheOrder() throws {
+        let model = try makeModel()
+
+        model.move(from: IndexSet(integer: 2), to: 0)
+
+        let titles = MenuPlan.entries(for: model.store.value).map(\.title)
+        #expect(titles.first?.contains("json") == true)
+    }
+
+    @Test("Dragging is off while searching, because only part of the list is shown")
+    func draggingIsOffWhileSearching() throws {
+        let model = try makeModel()
+
+        model.search = "py"
+
+        #expect(!model.canReorder)
+    }
+
+    @Test("A drag that arrives while searching is ignored rather than guessed at")
+    func dragWhileSearchingIsIgnored() throws {
+        let model = try makeModel()
+        model.search = "py"
+
+        model.move(from: IndexSet(integer: 0), to: 2)
+
+        #expect(model.types.map(\.displayName) == ["markdown", "python", "json"])
+    }
+
+    @Test("Dragging is on again once the search is cleared")
+    func draggingIsOnAgainAfterSearch() throws {
+        let model = try makeModel()
+        model.search = "py"
+
+        model.search = ""
+
+        #expect(model.canReorder)
+    }
+}

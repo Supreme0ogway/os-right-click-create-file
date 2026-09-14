@@ -51,6 +51,18 @@ public enum MenuPlan {
         return all[place]
     }
 
+    /// What the one entry in the right click menu is called.
+    ///
+    /// The file types hang off it rather than sitting in the menu themselves, so the
+    /// Finder's own menu gains one line however many types somebody has.
+    public static var parentTitle: String {
+        String(
+            localized: "menu.parent",
+            bundle: .module,
+            comment: "The one entry added to the right click menu"
+        )
+    }
+
     /// Whether a menu should be shown at all.
     ///
     /// When this is `false` the extension must show nothing, not an empty menu, so the

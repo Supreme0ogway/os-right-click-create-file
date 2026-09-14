@@ -60,6 +60,38 @@ public struct Legend: Hashable, Codable, Sendable {
         Self(version: version, types: types.filter { $0.id != id })
     }
 
+    /// A legend with some types moved to a new place in the order.
+    ///
+    /// The order is what the right click menu shows, so moving a type here is how
+    /// somebody decides where it appears in that menu.
+    ///
+    /// - Parameters:
+    ///   - offsets: Where the types being moved are now.
+    ///   - destination: Where they should land, counted before anything is taken out,
+    ///     which is how a list hands over a drag.
+    /// - Returns: A new legend. The original is untouched.
+    public func moving(from offsets: [Int], to destination: Int) -> Self {
+        let taken = offsets.sorted().filter { types.indices.contains($0) }
+        guard !taken.isEmpty else { return self }
+
+        let moving = taken.map { types[$0] }
+        let staying = types.enumerated()
+            .filter { !taken.contains($0.offset) }
+            .map(\.element)
+
+        let landing = destination - taken.filter { $0 < destination }.count
+        return Self(version: version, types: inserting(moving, into: staying, at: landing))
+    }
+
+    private func inserting(
+        _ moving: [FileType],
+        into staying: [FileType],
+        at landing: Int
+    ) -> [FileType] {
+        let place = min(max(landing, 0), staying.count)
+        return Array(staying[..<place]) + moving + Array(staying[place...])
+    }
+
     private static func withoutRepeats(_ types: [FileType]) -> [FileType] {
         var seen = Set<FileTypeIdentifier>()
         return types.filter { seen.insert($0.id).inserted }

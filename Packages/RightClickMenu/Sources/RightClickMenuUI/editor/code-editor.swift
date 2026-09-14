@@ -56,9 +56,16 @@ public struct CodeEditor: NSViewRepresentable {
         scroll.documentView = textView
         scroll.hasVerticalScroller = true
         scroll.borderType = .bezelBorder
-        scroll.verticalRulerView = LineNumberRuler(textView: textView)
+        scroll.autohidesScrollers = true
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+
         scroll.hasVerticalRuler = true
+        scroll.verticalRulerView = LineNumberRuler(textView: textView)
         scroll.rulersVisible = true
+
+        scroll.heightAnchor
+            .constraint(equalToConstant: CodeEditorLayout.height)
+            .isActive = true
 
         context.coordinator.textView = textView
         context.coordinator.storage = storage

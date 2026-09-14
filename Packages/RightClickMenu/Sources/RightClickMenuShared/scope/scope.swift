@@ -10,7 +10,11 @@
 public struct Scope: Hashable, Codable, Sendable {
 
     /// The two answers to "where should the menu appear".
-    public enum Places: Hashable, Codable, Sendable {
+    ///
+    /// Written out by hand rather than left to the compiler, because the compiler
+    /// spells a choice like this with a field called `_0`, and these files are meant
+    /// to be opened and read by a person.
+    public enum Places: Hashable, Sendable {
 
         /// Anywhere the Finder will let the extension look.
         case everywhere
@@ -93,5 +97,49 @@ public struct Scope: Hashable, Codable, Sendable {
         let isLongerThanRoot = trimmed.count > ScopeConstants.rootPath.count
         guard isLongerThanRoot, trimmed.hasSuffix(ScopeConstants.rootPath) else { return trimmed }
         return String(trimmed.dropLast())
+    }
+}
+
+// MARK: - Reading and writing
+
+extension Scope.Places: Codable {
+
+    private enum Key: String, CodingKey {
+        case placesKind = "where"
+        case folders
+    }
+
+    /// Reads where the menu appears, treating anything unexpected as everywhere.
+    ///
+    /// Everywhere is the safer of the two to fall back to: the worst it does is offer
+    /// the menu somewhere it was not wanted, where falling back to a list of no
+    /// folders would switch the menu off without saying so.
+    ///
+    /// - Parameter decoder: The decoder holding the choice.
+    /// - Throws: A decoding error when the value is not an object at all.
+    public init(from decoder: any Decoder) throws {
+        let holder = try decoder.container(keyedBy: Key.self)
+        let named = try holder.decode(String.self, forKey: .placesKind)
+
+        guard named == ScopeConstants.foldersName else {
+            self = .everywhere
+            return
+        }
+        self = .folders(try holder.decodeIfPresent([String].self, forKey: .folders) ?? [])
+    }
+
+    /// Writes where the menu appears as a small object a person can read.
+    ///
+    /// - Parameter encoder: The encoder to write into.
+    /// - Throws: Whatever the encoder throws.
+    public func encode(to encoder: any Encoder) throws {
+        var holder = encoder.container(keyedBy: Key.self)
+
+        guard case .folders(let paths) = self else {
+            try holder.encode(ScopeConstants.everywhereName, forKey: .placesKind)
+            return
+        }
+        try holder.encode(ScopeConstants.foldersName, forKey: .placesKind)
+        try holder.encode(paths, forKey: .folders)
     }
 }

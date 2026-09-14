@@ -13,15 +13,24 @@ public struct LegendEditorView: View {
     @State private var picked: FileTypeIdentifier?
     @State private var isAdding = false
 
+    @Environment(\.colorScheme) private var appearance
+
+    private let preferences: RecordStore<Preferences>
     private let onOpenSettings: () -> Void
 
     /// Builds the screen.
     ///
     /// - Parameters:
     ///   - model: What the screen knows and can do.
+    ///   - preferences: The choices the app remembers between launches.
     ///   - onOpenSettings: What to do when the settings button is pressed.
-    public init(model: LegendEditorViewModel, onOpenSettings: @escaping () -> Void) {
+    public init(
+        model: LegendEditorViewModel,
+        preferences: RecordStore<Preferences>,
+        onOpenSettings: @escaping () -> Void
+    ) {
         self._model = State(initialValue: model)
+        self.preferences = preferences
         self.onOpenSettings = onOpenSettings
     }
 
@@ -31,10 +40,8 @@ public struct LegendEditorView: View {
         } detail: {
             detail
         }
-        .navigationTitle(UIText.title)
-        .toolbarBackground(Brand.band, for: .windowToolbar)
-        .toolbarBackground(.visible, for: .windowToolbar)
-        .searchable(text: $model.search, prompt: UIText.search)
+        .navigationTitle(UIText.appName)
+        .searchable(text: $model.search, placement: .toolbar, prompt: UIText.search)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button(UIText.addType, systemImage: EditorLayout.addIconName) { isAdding = true }
@@ -46,13 +53,23 @@ public struct LegendEditorView: View {
             }
         }
         .sheet(isPresented: $isAdding) { addSheet }
+        .alert(
+            UIText.removeQuestion(model.pendingRemovalName),
+            isPresented: askingToRemove
+        ) {
+            Button(UIText.removeCancel, role: .cancel) { model.cancelRemoval() }
+            Button(UIText.removeConfirm, role: .destructive) { model.confirmRemoval() }
+        } message: {
+            Text(UIText.removeWarning)
+        }
     }
 
     private var addSheet: some View {
         AddTypeSheet(
             model: AddTypeViewModel(
                 known: BuiltInLegend.knownTypes(),
-                taken: Set(model.types.map(\.id))
+                taken: Set(model.types.map(\.id)),
+                preferences: preferences
             ),
             onAdd: { type in
                 model.add(type)
@@ -64,9 +81,18 @@ public struct LegendEditorView: View {
     }
 
     private var typeList: some View {
-        List(model.shownTypes, selection: $picked) { type in
-            TypeRow(type: type)
-                .tag(type.id)
+        List(selection: $picked) {
+            ForEach(model.shownTypes) { type in
+                TypeRow(type: type, appearance: appearance)
+                    .tag(type.id)
+                    .contextMenu {
+                        Button(UIText.removeConfirm, role: .destructive) {
+                            model.askToRemove(type.id)
+                        }
+                    }
+            }
+            .onMove(perform: model.move)
+            .moveDisabled(!model.canReorder)
         }
         .overlay { listOverlay }
         .navigationSplitViewColumnWidth(
@@ -110,25 +136,19 @@ public struct LegendEditorView: View {
         }
     }
 
+    private var askingToRemove: Binding<Bool> {
+        Binding(
+            get: { model.isAskingToRemove },
+            set: { stillAsking in
+                guard !stillAsking else { return }
+                model.cancelRemoval()
+            }
+        )
+    }
+
     private var pickedType: FileType? {
         guard let picked else { return nil }
         return model.types.first { $0.id == picked }
-    }
-}
-
-/// One file type in the list, with the extension it writes.
-struct TypeRow: View {
-
-    let type: FileType
-
-    var body: some View {
-        HStack {
-            Text(type.displayName)
-            Spacer()
-            Text(type.fileExtension)
-                .font(.caption.monospaced())
-                .foregroundStyle(.secondary)
-        }
     }
 }
 

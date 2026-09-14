@@ -4,45 +4,73 @@ import SwiftUI
 ///
 /// Shows only the newest release. Somebody looking here wants to know what just
 /// changed, not the whole history.
-struct AboutSection: View {
+struct AboutPanel: View {
 
     let version: String
     let latest: Release?
 
     var body: some View {
-        Section {
-            LabeledContent(UIText.aboutTitle) {
+        ScrollView {
+            VStack(alignment: .leading, spacing: AboutLayout.blockGap) {
                 Text(UIText.version(version))
-                    .foregroundStyle(.secondary)
-            }
+                    .font(.title3.weight(.semibold))
 
-            if let latest {
-                VStack(alignment: .leading, spacing: AboutLayout.noteGap) {
+                if let latest {
                     Text(UIText.whatsNew)
-                        .font(.headline)
-                    ForEach(latest.notes, id: \.self) { note in
-                        Label(note, systemImage: AboutLayout.noteIconName)
-                            .font(.callout)
-                            .labelStyle(.titleAndIcon)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+
+                    VStack(alignment: .leading, spacing: AboutLayout.noteGap) {
+                        ForEach(latest.notes, id: \.self) { note in
+                            NoteLine(note)
+                        }
                     }
                 }
-                .padding(.vertical, AboutLayout.blockPadding)
+
+                Spacer(minLength: 0)
             }
-        } header: {
-            Text(UIText.aboutTitle)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(FieldLayout.formPadding)
         }
     }
 }
 
-/// Fixed sizes and symbols for the about part of settings.
+/// One line of what changed.
+struct NoteLine: View {
+
+    private let note: String
+
+    /// Builds the line.
+    ///
+    /// - Parameter note: What changed. Already in the user's language.
+    init(_ note: String) {
+        self.note = note
+    }
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: AboutLayout.bulletGap) {
+            Text(AboutLayout.bullet)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(note)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
+/// Fixed sizes and marks for the about part of settings.
 enum AboutLayout {
 
-    /// The symbol beside each line of what changed.
-    static let noteIconName = "circle.fill"
+    /// What starts each line of what changed.
+    static let bullet = "•"
+
+    /// The space between the mark and the words beside it.
+    static let bulletGap: CGFloat = 8
 
     /// The space between the lines of what changed.
-    static let noteGap: CGFloat = 8
+    static let noteGap: CGFloat = 6
 
-    /// The space above and below the block of notes.
-    static let blockPadding: CGFloat = 6
+    /// The space between the blocks on the panel.
+    static let blockGap: CGFloat = 12
 }

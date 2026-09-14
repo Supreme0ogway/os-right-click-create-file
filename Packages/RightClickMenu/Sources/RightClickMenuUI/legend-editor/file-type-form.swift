@@ -68,7 +68,9 @@ struct FileTypeForm: View {
         VStack(alignment: .leading, spacing: FieldLayout.lineGap) {
             FieldLabel(UIText.contents)
             CodeEditor(text: $template, fileExtension: fileExtension)
+                .frame(maxWidth: .infinity)
                 .frame(height: CodeEditorLayout.height)
+                .clipped()
             Text(UIText.contentsHint)
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -77,7 +79,7 @@ struct FileTypeForm: View {
 
     private var removeBubble: some View {
         Button {
-            model.removeType(type.id)
+            model.askToRemove(type.id)
         } label: {
             Image(systemName: EditorLayout.removeIconName)
                 .font(.system(size: EditorLayout.bubbleIconSize, weight: .semibold))

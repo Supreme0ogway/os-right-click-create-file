@@ -12,10 +12,28 @@ public enum Brand {
     /// The deeper blue at the bottom of the icon's tile.
     public static let deep = Color(.sRGB, red: 0.16, green: 0.27, blue: 0.80)
 
-    /// The icon's tile, as a band to put behind the top of a window.
+    /// The color across the top of a window.
+    ///
+    /// Full color at the left, where the title sits, fading to nothing a little past
+    /// it. Nothing else in the window is colored: the list and the panel keep the
+    /// system's own background.
     public static let band = LinearGradient(
-        colors: [light, deep],
+        stops: [
+            .init(color: deep, location: 0),
+            .init(color: light, location: BrandBand.fadeStart),
+            .init(color: light.opacity(0), location: BrandBand.fadeEnd),
+        ],
         startPoint: .leading,
         endPoint: .trailing
     )
+}
+
+/// Where the color across the top of a window fades out.
+enum BrandBand {
+
+    /// How far along the band the color starts to go, as a share of the width.
+    static let fadeStart = 0.18
+
+    /// How far along the band the color is gone, as a share of the width.
+    static let fadeEnd = 0.38
 }

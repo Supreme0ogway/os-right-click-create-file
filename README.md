@@ -1,17 +1,36 @@
 # Right Click Menu
 
-Adds **New _<type>_** entries to the macOS right click menu, on the Desktop and in any
-Finder window. Click one and the file appears in the folder you clicked.
+Adds a **New File** entry to the macOS right click menu, on the Desktop and in any
+Finder window. Hover it and your file types fly out, each with the icon macOS already
+uses for that kind. Click one and the file appears in the folder you clicked.
 
-The types are yours. Add or remove them in the app, no rebuild. Remove every last one
-and the menu goes back to looking exactly like a stock macOS menu, as though the app
-had never been installed.
+The types are yours. Add, rename, reorder or remove them in the app, no rebuild.
+Remove every last one and the menu goes back to looking exactly like a stock macOS
+menu, as though the app had never been installed.
 
+It arrives with Markdown, JSON, Shell, JavaScript and Python.
+
+## What it does
+
+- **Add a type** from a list of 13 kinds it already knows, or type your own extension.
+  Names and extensions are checked as you go: no dots or spaces in an extension, no
+  leading or trailing blanks anywhere, nothing that would write the file somewhere else.
+- **Give each type its starting contents** in an editor with line numbers and coloring
+  that follows the extension.
+- **Search** your types by name or extension.
+- **Drag to reorder** them. The order in the list is the order in the menu.
+- **Choose where the menu appears** — everywhere, or only in folders you pick. A folder
+  you choose includes every folder inside it.
+- **Choose what the add screen opens on**, including a custom extension you use often.
+- **Export and import** your types as a JSON file. Importing adds to your list, so
+  nothing is lost. A file that cannot be read says so and changes nothing.
 - **Lives in the menu bar.** Opening the window puts it in the dock; closing the window
   takes it back out and leaves it running. Quit is in the menu bar item.
 - **Opens at login**, if you want it to.
-- **Appears where you say.** Everywhere, or only in folders you pick. A picked folder
-  covers everything inside it.
+
+The menu bar says when the menu is switched off by your own settings — no folders
+chosen, or no types left — because both are allowed and both look exactly like the app
+being broken.
 
 ## Install
 
@@ -53,13 +72,14 @@ touches it.
 ```sh
 make run         # build, install to /Applications, register, restart Finder, launch
 make test        # the test run. seconds, no Xcode needed
-make lint        # swiftlint
+make lint        # swiftlint, and the spelling check
 make diagnose    # is the extension registered and elected?
 make clean
 ```
 
-`make run` installs to `/Applications`. An extension run from anywhere else is the
-usual cause of Finder quietly loading a stale copy.
+`make run` installs to `/Applications` and stops any copy already running first.
+An extension run from anywhere else, or an old copy left running, is the usual reason a
+change appears to do nothing.
 
 ## How it is put together
 
@@ -69,23 +89,31 @@ not sandboxed                        sandboxed, because it must be
 menu bar, window, login item         thin. builds the menu, forwards a click
 ** writes every file **              reads the legend, writes nothing
         |                                      ^
-        | writes legend + scope                | reads
+        | writes legend, scope, settings       | reads
         +---------> shared app group <---------+
 ```
 
 The extension is not allowed to write anything, so a click travels to the app as an
-address and the app makes the file.
+address and the app makes the file. The shared folder is named after whoever signed
+both halves, which the app reads off its own signature.
+
+Everything it keeps is plain JSON in that folder, written to be read by a person:
+`legend.json`, `scope.json`, `preferences.json`.
 
 | | |
 |---|---|
-| `Packages/RightClickMenu` | Every decision, and every test. `swift test` needs no Xcode. |
+| `Packages/RightClickMenu` | Every decision, and all 287 tests. `swift test` needs no Xcode. |
 | ┗ `…Shared` | The records. Imports nothing at all, so they read the same inside the sandbox as out. |
-| ┗ `…Core` | The store, choosing a free file name, writing the file, planning the menu. |
-| ┗ `…UI` | The screens, each a view beside its view model. |
-| `bundles/` | The two bundles. They hold no decisions. |
+| ┗ `…Core` | The store everything subscribes to, choosing a free file name, writing the file, planning the menu. |
+| ┗ `…UI` | The screens, each a view beside its view model. A view model imports no drawing framework, which is why its rules are tested. |
+| `bundles/` | The app and the extension. They hold no decisions. |
 | `project.yml` | The whole Xcode project. The `.xcodeproj` is generated, never committed. |
 | `scripts/make-icon.sh` | Draws the app icon. It is code, not a picture. |
 | `docs/CODE-RULES.md` | How the code here is written. |
+| `docs/USAGE-LAWS.md` | What an assistant working in here may touch. |
+
+The one outside dependency is [Highlightr](https://github.com/raspu/Highlightr), which
+colors the contents editor.
 
 ## Licence
 

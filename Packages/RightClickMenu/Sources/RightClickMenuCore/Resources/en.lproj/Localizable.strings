@@ -1,2 +1,5 @@
 /* The right click menu entry that makes one new file. %@ is the type, such as "Text File". */
 "menu.new-file" = "New %@";
+
+/* The one entry added to the right click menu. Hovering it opens the file types. */
+"menu.parent" = "New File";

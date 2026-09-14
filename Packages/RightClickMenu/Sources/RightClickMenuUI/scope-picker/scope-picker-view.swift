@@ -1,14 +1,14 @@
 import SwiftUI
 
-/// The part of settings that chooses where the right click menu appears.
+/// The panel that chooses where the right click menu appears.
 ///
 /// Layout only. What each choice means, and what happens when the last folder goes,
 /// is decided in the model this reads from.
-public struct ScopePickerSection: View {
+public struct ScopePickerPanel: View {
 
     private let model: ScopePickerViewModel
 
-    /// Builds the section.
+    /// Builds the panel.
     ///
     /// - Parameter model: What it knows and can do.
     public init(model: ScopePickerViewModel) {
@@ -16,7 +16,7 @@ public struct ScopePickerSection: View {
     }
 
     public var body: some View {
-        Section {
+        VStack(alignment: .leading, spacing: FieldLayout.rowGap) {
             Picker(UIText.scopeTitle, selection: choiceBinding) {
                 Text(UIText.everywhere).tag(true)
                 Text(UIText.pickedFolders).tag(false)
@@ -25,15 +25,13 @@ public struct ScopePickerSection: View {
             .labelsHidden()
 
             if !model.isEverywhere {
-                folderRows
+                folders
             }
-        } header: {
-            Text(UIText.scopeTitle)
-        } footer: {
-            Text(UIText.pickedNote)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+
+            Spacer(minLength: 0)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(FieldLayout.formPadding)
     }
 
     private var choiceBinding: Binding<Bool> {
@@ -45,27 +43,56 @@ public struct ScopePickerSection: View {
         )
     }
 
-    @ViewBuilder
-    private var folderRows: some View {
-        ForEach(model.folderPaths, id: \.self) { path in
-            FolderRow(path: path) { model.removeFolder(path) }
-        }
+    private var folders: some View {
+        VStack(alignment: .leading, spacing: ScopeLayout.blockGap) {
+            if !model.folderPaths.isEmpty {
+                folderList
+            }
 
-        if model.showsNowhereWarning {
-            EmptyState(
-                title: UIText.nowhereTitle,
-                message: UIText.nowhereMessage,
-                iconName: EditorLayout.emptyIconName
-            )
-        }
+            Button(UIText.addFolder, systemImage: EditorLayout.addIconName, action: pickFolder)
 
-        Button(UIText.addFolder, systemImage: EditorLayout.addIconName, action: pickFolder)
+            Text(noteLine)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.top, model.folderPaths.isEmpty ? ScopeLayout.emptyGap : 0)
+    }
+
+    private var folderList: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(model.folderPaths.enumerated()), id: \.element) { place, path in
+                if place > 0 {
+                    Divider()
+                }
+
+                FolderRow(path: path) { model.removeFolder(path) }
+                    .padding(.vertical, ScopeLayout.rowPadding)
+            }
+        }
+    }
+
+    private var noteLine: String {
+        model.showsNowhereWarning ? UIText.nowhereMessage : UIText.pickedNote
     }
 
     private func pickFolder() {
         guard let folder = FolderPanel.ask() else { return }
         model.addFolder(folder)
     }
+}
+
+/// Fixed spaces for the panel that chooses where the menu appears.
+enum ScopeLayout {
+
+    /// The space between the blocks of the panel.
+    static let blockGap: CGFloat = 12
+
+    /// The space above the add button while no folder has been chosen, so the button
+    /// does not sit hard against the choice above it.
+    static let emptyGap: CGFloat = 10
+
+    /// The space above and below one folder in the list.
+    static let rowPadding: CGFloat = 7
 }
 
 /// One folder in the list, with the way to drop it.

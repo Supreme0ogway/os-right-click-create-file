@@ -93,3 +93,29 @@ struct MenuPlanTests {
         #expect(MenuPlan.hasAnythingToShow(legend))
     }
 }
+
+@Suite("Menu plan parent")
+struct MenuPlanParentTests {
+
+    @Test("The one entry has something to say")
+    func parentHasATitle() {
+        #expect(!MenuPlan.parentTitle.isEmpty)
+    }
+
+    @Test("The one entry is not named after any single type")
+    func parentIsNotAType() throws {
+        let legend = Legend(types: [
+            FileType(
+                id: try FileTypeIdentifier("core:markdown"),
+                displayName: "Markdown File",
+                fileExtension: "md",
+                defaultBaseName: "Untitled",
+                template: ""
+            )
+        ])
+
+        let titles = MenuPlan.entries(for: legend).map(\.title)
+
+        #expect(!titles.contains(MenuPlan.parentTitle))
+    }
+}

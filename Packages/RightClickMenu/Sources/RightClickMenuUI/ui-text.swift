@@ -39,8 +39,8 @@ public enum UIText {
     /// The text every new file of this type starts with.
     public static let template = String(localized: "editor.template", bundle: .module)
 
-    /// The editor window's title.
-    public static let title = String(localized: "editor.title", bundle: .module)
+    /// The app's name, shown at the top of its window.
+    public static let appName = String(localized: "app.name", bundle: .module)
 
     /// The tab holding the list of file types.
     public static let tabTypes = String(localized: "scope.tab-types", bundle: .module)
@@ -132,9 +132,6 @@ public enum UIText {
     /// Heading of the part of settings choosing where the menu appears.
     public static let scopeTitle = String(localized: "scope.title", bundle: .module)
 
-    /// Title of the screen for adding a file type.
-    public static let addTitle = String(localized: "add.title", bundle: .module)
-
     /// Label for the dropdown of file kinds the app already knows.
     public static let addKind = String(localized: "add.kind", bundle: .module)
 
@@ -198,5 +195,43 @@ public enum UIText {
         case .holdsPathCharacter:
             String(localized: "problem.holds-path-character", bundle: .module)
         }
+    }
+
+    /// Heading of the part of settings choosing what the add screen starts on.
+    public static let defaultKindTitle = String(localized: "default-kind.title", bundle: .module)
+
+    /// Label for the choice of what the add screen starts on.
+    public static let defaultKindLabel = String(localized: "default-kind.label", bundle: .module)
+
+    /// Explains what choosing a starting kind does.
+    public static let defaultKindNote = String(localized: "default-kind.note", bundle: .module)
+
+    /// Label for the extension a custom default starts from.
+    public static let defaultKindCustomExtension = String(
+        localized: "default-kind.custom-extension",
+        bundle: .module
+    )
+
+    /// Explains that a blank default extension means typing one every time.
+    public static let defaultKindCustomHint = String(
+        localized: "default-kind.custom-hint",
+        bundle: .module
+    )
+
+    /// Explains that removing a file type cannot be undone.
+    public static let removeWarning = String(localized: "remove.warning", bundle: .module)
+
+    /// Goes ahead with removing a file type.
+    public static let removeConfirm = String(localized: "remove.confirm", bundle: .module)
+
+    /// Leaves the file type alone.
+    public static let removeCancel = String(localized: "remove.cancel", bundle: .module)
+
+    /// Asks whether a file type should be removed.
+    ///
+    /// - Parameter name: What the type is called.
+    /// - Returns: The question to show.
+    public static func removeQuestion(_ name: String) -> String {
+        String(format: String(localized: "remove.question", bundle: .module), name)
     }
 }

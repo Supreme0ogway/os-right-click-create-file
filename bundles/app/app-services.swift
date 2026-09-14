@@ -18,6 +18,9 @@ final class AppServices {
     /// Where the menu is allowed to appear.
     let scope: RecordStore<Scope>
 
+    /// The choices the app remembers between launches.
+    let preferences: RecordStore<Preferences>
+
     /// Whether the app and the Finder extension can actually share files.
     let sharesWithExtension: Bool
 
@@ -34,6 +37,10 @@ final class AppServices {
             fileURL: folder.appending(path: ScopeConstants.fileName),
             fallback: .fallback
         )
+        preferences = RecordStore(
+            fileURL: folder.appending(path: PreferencesConstants.fileName),
+            fallback: .fallback
+        )
 
         saveFirstRunDefaults()
     }
@@ -41,6 +48,7 @@ final class AppServices {
     private func saveFirstRunDefaults() {
         try? legend.save(legend.value)
         try? scope.save(scope.value)
+        try? preferences.save(preferences.value)
     }
 
     private static func storageFolder() -> URL {

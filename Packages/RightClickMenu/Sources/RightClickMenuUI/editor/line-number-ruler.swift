@@ -13,6 +13,8 @@ final class LineNumberRuler: NSRulerView {
         super.init(scrollView: textView.enclosingScrollView, orientation: .verticalRuler)
         clientView = textView
         ruleThickness = RulerLayout.width
+        wantsLayer = true
+        layer?.masksToBounds = true
     }
 
     @available(*, unavailable)

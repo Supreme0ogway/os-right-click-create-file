@@ -9,4 +9,10 @@ public enum ScopeConstants {
 
     /// The top of the file system, and the separator between folder names.
     public static let rootPath = "/"
+
+    /// What watching everything is called in the file.
+    public static let everywhereName = "everywhere"
+
+    /// What watching a chosen list is called in the file.
+    public static let foldersName = "folders"
 }

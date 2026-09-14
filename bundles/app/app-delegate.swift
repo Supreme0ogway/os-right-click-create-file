@@ -10,6 +10,10 @@ import os
 ///
 /// A refused write is said out loud rather than swallowed: a menu that appears to do
 /// nothing is worse than one that explains itself.
+///
+/// - Note: The new file is deliberately not revealed afterwards. Revealing it brings
+///   the Finder forward and rewrites what is selected, which reads as the window
+///   blinking, and the file is already on screen in the folder that was clicked.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -66,7 +70,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 in: URL(filePath: request.folderPath)
             )
             log.info("wrote \(written.path, privacy: .public)")
-            NSWorkspace.shared.activateFileViewerSelecting([written])
         } catch {
             report(AppText.couldNotWrite(error))
         }

@@ -16,6 +16,8 @@ final class EditorWindow: NSObject, NSWindowDelegate {
     private let legend: LegendEditorViewModel
     private let scope: ScopePickerViewModel
     private let transfer: TransferViewModel
+    private let preferences: RecordStore<Preferences>
+    private let defaultKind: DefaultKindViewModel
 
     private var window: NSWindow?
 
@@ -26,6 +28,11 @@ final class EditorWindow: NSObject, NSWindowDelegate {
         legend = LegendEditorViewModel(store: services.legend)
         scope = ScopePickerViewModel(store: services.scope)
         transfer = TransferViewModel(store: services.legend)
+        preferences = services.preferences
+        defaultKind = DefaultKindViewModel(
+            known: BuiltInLegend.knownTypes(),
+            store: services.preferences
+        )
     }
 
     /// Brings the window up, putting the app in the dock while it is there.
@@ -59,6 +66,8 @@ final class EditorWindow: NSObject, NSWindowDelegate {
                 legend: legend,
                 scope: scope,
                 transfer: transfer,
+                preferences: preferences,
+                defaultKind: defaultKind,
                 version: AppVersion.current
             )
         )
@@ -66,6 +75,7 @@ final class EditorWindow: NSObject, NSWindowDelegate {
         window.delegate = self
         window.center()
         window.setFrameAutosaveName(EditorWindowSize.autosaveName)
+        ColorDiff.apply(to: window)
         return window
     }
 }

@@ -27,3 +27,9 @@
 
 /* Menu bar switch that makes the app start when the mac starts. */
 "app.open-at-login" = "Open at Login";
+
+/* Menu bar entry shown when the scope was narrowed to no folders at all. */
+"app.appears-nowhere" = "Menu is off — no folders chosen";
+
+/* Menu bar entry shown when every file type has been removed. */
+"app.no-types" = "Menu is off — no file types";

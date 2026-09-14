@@ -34,21 +34,46 @@ public final class AddTypeViewModel {
     public var template: String
 
     private let taken: Set<FileTypeIdentifier>
+    private let preferences: RecordStore<Preferences>
 
     /// Builds the add screen's model, already filled in with a sensible answer.
+    ///
+    /// Opens ready for a typed extension when that was asked for last time, so
+    /// somebody who mostly adds kinds the app does not know sets it once.
     ///
     /// - Parameters:
     ///   - known: The kinds of file the app already knows about.
     ///   - taken: The ids already in use, so a new type never clashes.
-    public init(known: Legend, taken: Set<FileTypeIdentifier>) {
+    ///   - preferences: The choices the app remembers between launches.
+    public init(
+        known: Legend,
+        taken: Set<FileTypeIdentifier>,
+        preferences: RecordStore<Preferences>
+    ) {
         let first = known.types.first
 
         choices = known.types
         self.taken = taken
+        self.preferences = preferences
         pickedExtension = first?.fileExtension ?? DefaultsConstants.fallbackExtension
         name = first?.displayName ?? ""
         baseName = first?.defaultBaseName ?? LegendConstants.fallbackBaseName
         template = first?.template ?? ""
+
+        startOnChosenKind()
+    }
+
+    private func startOnChosenKind() {
+        let kind = preferences.value.defaultKind
+
+        guard case .known(let wanted) = kind else {
+            useCustom()
+            name = ""
+            guard case .custom(let remembered) = kind else { return }
+            customExtension = remembered
+            return
+        }
+        pick(wanted)
     }
 
     /// The extension the new type will really get, with nothing blank around it.

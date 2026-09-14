@@ -2,14 +2,15 @@
   "version": 1,
   "releases": [
     {
-      "version": "0.1",
+      "version": "1.0.0",
       "when": "2026-09-14",
       "notes": [
-        "New file entries in the right click menu, on the desktop and in any Finder window.",
-        "Add and remove your own file types. Remove them all and the menu goes back to looking untouched.",
-        "Search your file types by name or by extension.",
+        "A New File entry in the right click menu, on the desktop and in any Finder window, with your types flying out of it under the icon the mac already uses for each.",
+        "Add your own types from the kinds it knows or from an extension you type, and give each one the contents its files start with, in an editor with line numbers and coloring.",
+        "Search your types, drag them into the order the menu shows them in, and remove any of them. Remove them all and the menu goes back to looking untouched.",
         "Choose where the menu appears: everywhere, or only in folders you pick.",
-        "Write your file types out to a file, and bring them back in.",
+        "Choose what the add screen opens on, including an extension you use often.",
+        "Write your types out to a file and bring them back in.",
         "Opens at login, lives in the menu bar, and shows in the dock only while its window is open."
       ]
     }

@@ -10,6 +10,8 @@ public struct MainWindowView: View {
     private let legend: LegendEditorViewModel
     private let scope: ScopePickerViewModel
     private let transfer: TransferViewModel
+    private let preferences: RecordStore<Preferences>
+    private let defaultKind: DefaultKindViewModel
     private let version: String
 
     @State private var showsSettings = false
@@ -20,16 +22,22 @@ public struct MainWindowView: View {
     ///   - legend: The model for the list of file types.
     ///   - scope: The model for where the menu appears.
     ///   - transfer: The model for moving file types in and out.
+    ///   - preferences: The choices the app remembers between launches.
+    ///   - defaultKind: The model for what the add screen starts on.
     ///   - version: Which version the app is.
     public init(
         legend: LegendEditorViewModel,
         scope: ScopePickerViewModel,
         transfer: TransferViewModel,
+        preferences: RecordStore<Preferences>,
+        defaultKind: DefaultKindViewModel,
         version: String
     ) {
         self.legend = legend
         self.scope = scope
         self.transfer = transfer
+        self.preferences = preferences
+        self.defaultKind = defaultKind
         self.version = version
     }
 
@@ -47,12 +55,13 @@ public struct MainWindowView: View {
             SettingsView(
                 scope: scope,
                 transfer: transfer,
+                defaultKind: defaultKind,
                 version: version
             ) { showsSettings = false }
         }
 
         if !showsSettings {
-            LegendEditorView(model: legend) { showsSettings = true }
+            LegendEditorView(model: legend, preferences: preferences) { showsSettings = true }
         }
     }
 }

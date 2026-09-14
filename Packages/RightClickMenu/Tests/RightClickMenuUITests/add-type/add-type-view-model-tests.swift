@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 
 @testable import RightClickMenuUI
@@ -6,8 +7,22 @@ import Testing
 @Suite("Add type view model")
 struct AddTypeViewModelTests {
 
+    private func makePreferences() -> RecordStore<Preferences> {
+        let folder = URL.temporaryDirectory
+            .appending(path: "right-click-menu-tests/\(UUID().uuidString)")
+        try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        return RecordStore(
+            fileURL: folder.appending(path: PreferencesConstants.fileName),
+            fallback: Preferences.fallback
+        )
+    }
+
     private func makeModel() -> AddTypeViewModel {
-        AddTypeViewModel(known: BuiltInLegend.knownTypes(), taken: [])
+        AddTypeViewModel(
+            known: BuiltInLegend.knownTypes(),
+            taken: [],
+            preferences: makePreferences()
+        )
     }
 
     @Test("Offers the shipped list to pick from")
@@ -165,16 +180,16 @@ struct AddTypeViewModelTests {
     }
 
     @Test("Gives a type an id nothing else is using")
-    func givesAFreeId() {
-        let model = AddTypeViewModel(known: BuiltInLegend.knownTypes(), taken: [])
-        let first = model.build()
+    func givesAFreeId() throws {
+        let first = try #require(makeModel().build())
 
         let second = AddTypeViewModel(
             known: BuiltInLegend.knownTypes(),
-            taken: [first!.id]
+            taken: [first.id],
+            preferences: makePreferences()
         ).build()
 
-        #expect(first?.id != second?.id)
+        #expect(first.id != second?.id)
     }
 
     @Test("Carries the template of the type that was picked")
