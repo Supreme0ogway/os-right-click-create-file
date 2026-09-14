@@ -1,0 +1,29 @@
+/* Title of the warning shown when a file could not be made. */
+"app.could-not-make-file" = "Could not make the file";
+
+/* Shown when the Finder extension sent something this app does not understand. */
+"app.request-not-understood" = "The Finder asked for something this app did not understand.";
+
+/* Shown when the file type was removed between the menu opening and the click. */
+"app.type-no-longer-exists" = "That file type is no longer in your list.";
+
+/* Shown when the disk refused the write. %@ is the reason the system gave. */
+"app.could-not-write" = "%@";
+
+/* Menu bar item title. */
+"app.menu-title" = "Right Click Menu";
+
+/* Menu bar entry opening the window where file types are added and removed. */
+"app.edit-file-types" = "Edit File Types…";
+
+/* Menu bar entry that closes the app. */
+"app.quit" = "Quit Right Click Menu";
+
+/* Menu bar entry shown when the Finder extension has not been switched on yet. */
+"app.extension-is-off" = "Finder extension is off — turn it on";
+
+/* Menu bar entry shown when the app and the extension cannot share files. */
+"app.not-sharing" = "Cannot reach the shared folder — the menu will be empty";
+
+/* Menu bar switch that makes the app start when the mac starts. */
+"app.open-at-login" = "Open at Login";

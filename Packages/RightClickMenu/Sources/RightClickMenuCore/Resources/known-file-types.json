@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "types": [
+    {
+      "id": "core:plain-text",
+      "displayName": "Text File",
+      "fileExtension": "txt",
+      "defaultBaseName": "Untitled",
+      "template": ""
+    },
+    {
+      "id": "core:markdown",
+      "displayName": "Markdown File",
+      "fileExtension": "md",
+      "defaultBaseName": "Untitled",
+      "template": ""
+    },
+    {
+      "id": "core:json",
+      "displayName": "JSON File",
+      "fileExtension": "json",
+      "defaultBaseName": "Untitled",
+      "template": "{\n}\n"
+    },
+    {
+      "id": "core:shell",
+      "displayName": "Shell Script",
+      "fileExtension": "sh",
+      "defaultBaseName": "Untitled",
+      "template": "#!/usr/bin/env zsh\n\n"
+    },
+    {
+      "id": "core:javascript",
+      "displayName": "JavaScript File",
+      "fileExtension": "js",
+      "defaultBaseName": "Untitled",
+      "template": ""
+    },
+    {
+      "id": "core:typescript",
+      "displayName": "TypeScript File",
+      "fileExtension": "ts",
+      "defaultBaseName": "Untitled",
+      "template": ""
+    },
+    {
+      "id": "core:python",
+      "displayName": "Python File",
+      "fileExtension": "py",
+      "defaultBaseName": "Untitled",
+      "template": ""
+    },
+    {
+      "id": "core:swift",
+      "displayName": "Swift File",
+      "fileExtension": "swift",
+      "defaultBaseName": "Untitled",
+      "template": ""
+    },
+    {
+      "id": "core:html",
+      "displayName": "HTML File",
+      "fileExtension": "html",
+      "defaultBaseName": "Untitled",
+      "template": ""
+    },
+    {
+      "id": "core:css",
+      "displayName": "CSS File",
+      "fileExtension": "css",
+      "defaultBaseName": "Untitled",
+      "template": ""
+    },
+    {
+      "id": "core:yaml",
+      "displayName": "YAML File",
+      "fileExtension": "yml",
+      "defaultBaseName": "Untitled",
+      "template": ""
+    },
+    {
+      "id": "core:csv",
+      "displayName": "CSV File",
+      "fileExtension": "csv",
+      "defaultBaseName": "Untitled",
+      "template": ""
+    },
+    {
+      "id": "core:rich-text",
+      "displayName": "Rich Text File",
+      "fileExtension": "rtf",
+      "defaultBaseName": "Untitled",
+      "template": "{\\rtf1\\ansi\\ansicpg1252\\cocoartf2761\n\\pard\\f0\\fs24 \\\n}"
+    }
+  ]
+}

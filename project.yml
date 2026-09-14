@@ -1,0 +1,104 @@
+name: RightClickMenu
+
+options:
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: false
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: ${TEAM_ID}
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MARKETING_VERSION: "0.1"
+    CURRENT_PROJECT_VERSION: "1"
+    ENABLE_HARDENED_RUNTIME: YES
+    ALWAYS_SEARCH_USER_PATHS: NO
+
+packages:
+  RightClickMenu:
+    path: Packages/RightClickMenu
+
+targets:
+
+  RightClickMenu:
+    type: application
+    platform: macOS
+    sources:
+      - path: bundles/app
+    info:
+      path: bundles/app/Info.plist
+      properties:
+        CFBundleName: Right Click Menu
+        CFBundleDisplayName: Right Click Menu
+        CFBundleIconFile: AppIcon
+        CFBundleIconName: AppIcon
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        LSUIElement: true
+        NSHumanReadableCopyright: ""
+        CFBundleURLTypes:
+          - CFBundleURLName: com.willlattus.right-click-menu.create
+            CFBundleURLSchemes:
+              - right-click-menu
+    entitlements:
+      path: bundles/app/app.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+        com.apple.security.application-groups:
+          - ${TEAM_ID}.group.com.willlattus.right-click-menu
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.willlattus.right-click-menu
+        PRODUCT_NAME: Right Click Menu
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
+        COMBINE_HIDPI_IMAGES: YES
+    dependencies:
+      - target: finder-extension
+      - package: RightClickMenu
+        product: RightClickMenuUI
+      - package: RightClickMenu
+        product: RightClickMenuCore
+
+  finder-extension:
+    type: app-extension
+    platform: macOS
+    sources:
+      - path: bundles/finder-extension
+    info:
+      path: bundles/finder-extension/Info.plist
+      properties:
+        CFBundleName: finder-extension
+        CFBundleDisplayName: Right Click Menu
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.FinderSync
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).FinderMenuExtension
+    entitlements:
+      path: bundles/finder-extension/finder-extension.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.application-groups:
+          - ${TEAM_ID}.group.com.willlattus.right-click-menu
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.willlattus.right-click-menu.finder-extension
+        PRODUCT_MODULE_NAME: FinderExtension
+        SKIP_INSTALL: YES
+    dependencies:
+      - package: RightClickMenu
+        product: RightClickMenuCore
+
+schemes:
+  RightClickMenu:
+    build:
+      targets:
+        RightClickMenu: all
+        finder-extension: all
+    run:
+      config: Debug

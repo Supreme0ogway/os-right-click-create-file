@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "types": [
+    {
+      "id": "core:markdown",
+      "displayName": "Markdown File",
+      "fileExtension": "md",
+      "defaultBaseName": "Untitled",
+      "template": ""
+    },
+    {
+      "id": "core:json",
+      "displayName": "JSON File",
+      "fileExtension": "json",
+      "defaultBaseName": "Untitled",
+      "template": "{\n}\n"
+    },
+    {
+      "id": "core:shell",
+      "displayName": "Shell Script",
+      "fileExtension": "sh",
+      "defaultBaseName": "Untitled",
+      "template": "#!/usr/bin/env zsh\n\n"
+    },
+    {
+      "id": "core:javascript",
+      "displayName": "JavaScript File",
+      "fileExtension": "js",
+      "defaultBaseName": "Untitled",
+      "template": ""
+    },
+    {
+      "id": "core:python",
+      "displayName": "Python File",
+      "fileExtension": "py",
+      "defaultBaseName": "Untitled",
+      "template": ""
+    }
+  ]
+}

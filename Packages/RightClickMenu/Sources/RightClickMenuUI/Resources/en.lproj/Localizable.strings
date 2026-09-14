@@ -1,0 +1,167 @@
+/* The name a newly added file type starts with, before the user renames it. */
+"editor.new-type-name" = "New File Type";
+
+/* The extension a newly added file type starts with. */
+"editor.new-type-extension" = "txt";
+
+/* Shown in place of the list when the user has removed every file type. */
+"editor.empty-title" = "No file types";
+
+/* Explains that an empty list is allowed and what it does. */
+"editor.empty-message" = "Your right click menu shows nothing at all. Add a type to bring it back.";
+
+/* Button that adds a file type. */
+"editor.add" = "Add File Type";
+
+/* Button that removes the file type on this row. */
+"editor.remove" = "Remove";
+
+/* Label for the name shown in the right click menu. */
+"editor.name" = "Name";
+
+/* Label for the file extension, such as txt. */
+"editor.extension" = "Extension";
+
+/* Label for what a new file is called before its extension. */
+"editor.base-name" = "File name";
+
+/* Label for the text every new file of this type starts with. */
+"editor.template" = "Starts with";
+
+/* Title of the editor window. */
+"editor.title" = "File Types";
+
+/* Tab holding the list of file types. */
+"scope.tab-types" = "File Types";
+
+/* Tab holding the choice of where the menu appears. */
+"scope.tab-where" = "Where";
+
+/* Choice that shows the menu in every folder. */
+"scope.everywhere" = "Everywhere";
+
+/* Choice that shows the menu only in folders the user picks. */
+"scope.picked-folders" = "Only these folders";
+
+/* Explains that a picked folder also covers what is inside it. */
+"scope.picked-note" = "Each folder also covers everything inside it.";
+
+/* Button that opens the panel for picking a folder. */
+"scope.add-folder" = "Add Folder…";
+
+/* Title of the panel for picking a folder. */
+"scope.choose-folder" = "Choose a folder the menu should appear in";
+
+/* Button that confirms the picked folder. */
+"scope.choose" = "Choose";
+
+/* Shown when folders were chosen and then all removed. */
+"scope.nowhere-title" = "No folders";
+
+/* Explains that the menu now appears nowhere. */
+"scope.nowhere-message" = "Your right click menu shows nothing anywhere. Add a folder, or switch to Everywhere.";
+
+/* Shown beside Open at Login when the user still has to allow it in System Settings. */
+"login.waiting" = "Open at Login (allow it in System Settings)";
+
+/* Button that goes back from the settings screen to the list of file types. */
+"window.back" = "Back";
+
+/* Button that opens the settings screen. */
+"window.settings" = "Settings";
+
+/* Button that adds a file type, shown as a plus in the toolbar. */
+"window.add-type" = "Add File Type";
+
+/* Shown in the right hand side when no file type has been picked yet. */
+"editor.nothing-picked-title" = "No file type selected";
+
+/* Tells the user to pick a file type from the list to change it. */
+"editor.nothing-picked-message" = "Pick a file type on the left to change it, or add a new one.";
+
+/* Shown when a file of file types cannot be read. */
+"transfer.file-is-damaged" = "That file is corrupted and cannot be read.";
+
+/* Heading of the part of settings that writes file types out and reads them back. */
+"transfer.title" = "File Types";
+
+/* Button that writes every file type out to a file. */
+"transfer.export" = "Export…";
+
+/* Button that reads file types back in from a file. */
+"transfer.import" = "Import…";
+
+/* Explains what exporting and importing do. */
+"transfer.note" = "Importing adds to your list. A type with the same id is replaced.";
+
+/* Title of the panel for choosing where to write the file types. */
+"transfer.choose-destination" = "Where should your file types go?";
+
+/* Title of the panel for choosing a file of file types to read. */
+"transfer.choose-source" = "Choose a file of file types";
+
+/* Heading of the part of settings saying what the app is. */
+"about.title" = "About";
+
+/* Shown beside the version number. %@ is the version, such as 0.1. */
+"about.version" = "Version %@";
+
+/* Heading above the list of what changed in the newest release. */
+"about.whats-new" = "What's new";
+
+/* Heading of the part of settings choosing where the menu appears. */
+"scope.title" = "Where the menu appears";
+
+/* Title of the screen for adding a file type. */
+"add.title" = "Add a File Type";
+
+/* Label for the dropdown of file kinds the app already knows. */
+"add.kind" = "Kind";
+
+/* The entry in the dropdown that lets an extension be typed in. */
+"add.custom" = "Custom…";
+
+/* Button that adds the file type and closes the screen. */
+"add.confirm" = "Add";
+
+/* Button that closes the screen without adding anything. */
+"add.cancel" = "Cancel";
+
+/* Shown when a search matched none of the file types. */
+"editor.no-matches-title" = "No matches";
+
+/* Tells the user their search matched nothing. */
+"editor.no-matches-message" = "No file type matches what you typed.";
+
+/* The search box above the list of file types. */
+"editor.search" = "Search file types";
+
+/* A few words under the icon saying it follows the extension. */
+"editor.icon-note" = "Icon follows the file extension";
+
+/* A few words under the extension box saying what is allowed. */
+"editor.extension-hint" = "No dots or spaces";
+
+/* A few words under the name box. */
+"editor.name-hint" = "Shown in the right click menu";
+
+/* A few words under the file name box. */
+"editor.base-name-hint" = "What each new file is called";
+
+/* Label for the text every new file of this type starts with. */
+"editor.contents" = "File default contents";
+
+/* A few words under the contents editor. */
+"editor.contents-hint" = "Coloured to match the extension";
+
+/* Shown when a box has been left empty. */
+"problem.missing" = "This cannot be empty.";
+
+/* Shown when a dot was typed into the extension. */
+"problem.holds-dot" = "An extension cannot hold a dot.";
+
+/* Shown when a space was typed into the extension. */
+"problem.holds-space" = "An extension cannot hold a space.";
+
+/* Shown when a character was typed that would move the file elsewhere. */
+"problem.holds-path-character" = "This cannot hold a slash or a colon.";

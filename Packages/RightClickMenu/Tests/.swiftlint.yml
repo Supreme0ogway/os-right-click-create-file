@@ -1,0 +1,21 @@
+# §1: a test file is one logic file's sibling and may run to 1500 lines.
+# §6e and §7c exempt tests: a test states its numbers and its shape plainly.
+file_length:
+  warning: 1200
+  error: 1500
+
+function_body_length:
+  warning: 200
+  error: 400
+
+nesting:
+  type_level: 3
+  function_level: 5
+
+cyclomatic_complexity:
+  warning: 15
+  error: 25
+
+type_body_length:
+  warning: 1200
+  error: 1500

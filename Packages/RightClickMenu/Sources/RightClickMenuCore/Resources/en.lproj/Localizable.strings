@@ -1,0 +1,2 @@
+/* The right click menu entry that makes one new file. %@ is the type, such as "Text File". */
+"menu.new-file" = "New %@";
